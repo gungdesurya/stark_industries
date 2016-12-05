@@ -66,14 +66,14 @@ window.onload = function init()
     };
     document.getElementById( "yButton" ).onclick = function () {
         //axis = yAxis;
-        theta[0] = 45;
+        theta[0] = -25;
         theta[1] = 45;
-        theta[2] = 45;
+        theta[2] = 0;
     };
     document.getElementById( "zButton" ).onclick = function () {
         //axis = zAxis;
-        theta[0] = 45;
-        theta[1] = 45;
+        theta[0] = -25;
+        theta[1] = -45;
         theta[2] = 0;
     };
 
