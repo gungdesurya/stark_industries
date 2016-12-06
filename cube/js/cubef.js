@@ -15,7 +15,17 @@ var zAxis = 2;
 var axis = 0;
 var theta = [ 0, 0, 0 ];
 
+var scale = 1;
+var scaleIncrement=0.005;
+
+var look;
+
+var translate=[0, 0, 0];
+
 var thetaLoc;
+var lookLoc;
+var scaleLoc;
+var translateLoc;
 
 window.onload = function init()
 {
@@ -23,6 +33,11 @@ window.onload = function init()
 
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
+
+
+    document.getElementById("xCamera").value=0.1;
+    document.getElementById("yCamera").value=0.1;
+    document.getElementById("zCamera").value=-1.0;
 
     colorCube();
 
@@ -55,26 +70,27 @@ window.onload = function init()
     gl.enableVertexAttribArray( vPosition );
 
     thetaLoc = gl.getUniformLocation(program, "theta");
+    lookLoc = gl.getUniformLocation(program, "look");
+    scaleLoc = gl.getUniformLocation(program, "scale");
+    translateLoc=gl.getUniformLocation(program, "translate");
 
     //event listeners for buttons
 
     document.getElementById( "xButton" ).onclick = function () {
-        //axis = xAxis;
-        theta[0] = 0;
-        theta[1] = 0;
-        theta[2] = 0;
+        axis = xAxis;
     };
     document.getElementById( "yButton" ).onclick = function () {
-        //axis = yAxis;
-        theta[0] = -25;
-        theta[1] = 45;
-        theta[2] = 0;
+        axis = yAxis;
     };
     document.getElementById( "zButton" ).onclick = function () {
-        //axis = zAxis;
-        theta[0] = -25;
-        theta[1] = -45;
-        theta[2] = 0;
+        axis = zAxis;
+    };
+
+    document.getElementById( "scaleUp" ).onclick = function () {
+        scaleIncrement=0.005;
+    };
+    document.getElementById( "scaleDown" ).onclick = function () {
+        scaleIncrement=-0.005;
     };
 
     render();
@@ -135,9 +151,20 @@ function quad(a, b, c, d)
 function render()
 {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);    
 
-    //theta[axis] += 2.0;
+    if(document.getElementById("rotateCheck").checked) theta[axis] += 1.0;
     gl.uniform3fv(thetaLoc, theta);
+
+    var xCam=document.getElementById("xCamera").value;
+    var yCam=document.getElementById("yCamera").value;
+    var zCam=document.getElementById("zCamera").value;
+    look=flatten(lookAt(vec3(xCam, yCam, zCam), vec3(0.5, 0.5, 0.5), vec3(0.0, 1.0, 0.0)));
+    gl.uniformMatrix4fv(lookLoc, gl.FALSE, look);
+
+    
+    if(document.getElementById("scaleCheck").checked&&(scale>0.01&&scaleIncrement<0||scale<1.3&&scaleIncrement>0)) scale+=scaleIncrement;
+    gl.uniform1f(scaleLoc, scale);
 
     gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
 
